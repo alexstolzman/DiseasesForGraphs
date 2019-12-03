@@ -74,6 +74,16 @@ def generateEdges(cities, edges,type):
             edge = random.randint(0, len(cityEdges) - 1)
             cityEdges[edge].type = type
 
+def formsCycle(vertices, edges):
+   visited=[]
+
+
+
+
+
+
+   return False
+
 
 def main() -> None:
 
@@ -149,6 +159,7 @@ def main() -> None:
     vert_count = 0
     generated = False
     unselected_vertices = []
+    selected_edges=[]
 
     for v in vertices:
         unselected_vertices.append(v)
@@ -233,7 +244,7 @@ def main() -> None:
         for v in vertices:
             v.draw(screen)
 
-
+        '''
         if city_selected:
             for e in edges:
                 if all_done==False:
@@ -252,24 +263,32 @@ def main() -> None:
             all_edges.sort(key = operator.attrgetter('weight'), reverse=False)
 
             for e in all_edges:
-                if (any(x.pos == e.first[0] or x.pos == e.second[0] for x in unselected_vertices)):
+                selected_edges.append(e)
+                for v in unselected_vertices:
+                    if v.pos == e.first[0] or v.pos == e.second[0]:
+                        unselected_vertices.remove(v)
+                        selected_vertices.append(v)
+
+                if(not formsCycle(selected_vertices,selected_edges)):
+                #if (any(x.pos == e.first[0] or x.pos == e.second[0] for x in unselected_vertices)):
+
                     e.selected = True
-                    e.draw(screen, [255, 0, 255])
+
                     print(edge_counter)
                     edge_counter += 1
-                    # selected_vertices.append((e.first[0]))
-                    # selected_vertices.append(e.second[0])
 
-                    for v in unselected_vertices:
-                        if v.pos == e.first[0] or v.pos == e.second[0]:
-                            unselected_vertices.remove(v)
-                            selected_vertices.append(v)
+                    #for v in unselected_vertices:
+                        #if v.pos == e.first[0] or v.pos == e.second[0]:
+                            #unselected_vertices.remove(v)
+                            #selected_vertices.append(v)
                     # unselected_vertices.remove(e.first[0])
                     # unselected_vertices.remove(e.second[0])
+                else:
+                    for v in selected_vertices:
+                        if v.pos == e.first[0] or v.pos == e.second[0]:
+                            unselected_vertices.append(v)
+                            selected_vertices.remove(v)
 
-            if(edge_counter==8):
-                #do stuff
-                pass
 
             for v in vertices:
                 if not any(vs.pos == v.pos for vs in unselected_vertices):
@@ -285,16 +304,14 @@ def main() -> None:
 
          #print(len(unselected_vertices))
         '''
-        if city_selected:
-            while (len(unselected_vertices) >0):
+        if city_selected and all_done==False:
+            while (len(selected_vertices) <9):
                 connected_edges.clear()
                 for v in unselected_vertices:
                     if v.id == the_city_selected:
                         vert = v
                         selected_vertices.append(vert)
                         unselected_vertices.remove(vert)
-                        #print(len(unselected_vertices))
-                        #print(len(selected_vertices))
 
                 for e in edges:
                     for vert in selected_vertices:
@@ -304,12 +321,13 @@ def main() -> None:
                                     if not connected_edges.__contains__(e) and not e.selected:
                                         if(e.first[0] not in selected_vertices and e.second[0] not in selected_vertices):
                                             connected_edges.append(e)
+                                            #print(e.first[0]+e.second[0])
 
                         elif disease_selected == "Flu":
                             if e.type == "air":
                                 if e.first[0] == vert.pos or e.second[0] == vert.pos:
                                     if not connected_edges.__contains__(e) and not e.selected:
-                                        if (e.first[0] not in selected_vertices and e.second[ 0] not in selected_vertices):
+                                        if (e.first[0] not in selected_vertices and e.second[0] not in selected_vertices):
                                             connected_edges.append(e)
                         elif disease_selected == "Plague":
                             if e.type == "animals":
@@ -320,27 +338,30 @@ def main() -> None:
 
                 for ce in connected_edges:
                     if ce.weight < lowest and not ce.selected:
-                        lowest = ce.weight
-                        #print(len(selected_vertices))
+                        if not(any(x.pos==ce.first[0]for x in selected_vertices) and any(y.pos==ce.second[0] for y in selected_vertices)):
+                            lowest = ce.weight
+                            lowest_edge=ce
+
                 for ce in connected_edges:
-                    if ce.weight == lowest:
-                        #print(lowest)
+                    #print (ce.first[0]+ce.second[0])
+
+                    if ce==lowest_edge:
+                        print(len(selected_vertices))
                         ce.draw(screen, [255, 0, 255])
                         ce.selected = True
 
                         for vs in selected_vertices:
-                            if ce.first[0]==vs.pos:
-                                #print(ce.first[0])
+                            if ce.first[0] == vs.pos:
                                 temp = ce.second[0]
                                 for v in unselected_vertices:
                                     if v.pos == temp:
                                         the_city_selected = v.id
                                         for ve in vertices:
-                                            if ve.id==v.id:
+                                            if ve.id == v.id:
                                                 ve.change_color([255, 0, 255])
 
                                         v.change_color([255, 0, 255])
-                            elif ce.second[0]==vs.pos:
+                            elif ce.second[0] == vs.pos:
                                 temp = ce.first[0]
                                 for v in unselected_vertices:
                                     if v.pos == temp:
@@ -350,11 +371,12 @@ def main() -> None:
                                                 ve.change_color([255, 0, 255])
 
 
-                lowest = 21
-                print(len(unselected_vertices))
+                #print(len(unselected_vertices))
                 #print(len(selected_vertices))
                 #print(vert_count)
-            '''
+                lowest=21
+            all_done=True
+
 
 
         pygame.display.flip()
