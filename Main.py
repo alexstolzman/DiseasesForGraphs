@@ -267,6 +267,10 @@ def main() -> None:
                     # unselected_vertices.remove(e.first[0])
                     # unselected_vertices.remove(e.second[0])
 
+            if(edge_counter==8):
+                #do stuff
+                pass
+
             for v in vertices:
                 if not any(vs.pos == v.pos for vs in unselected_vertices):
                     v.change_color([255, 0, 255])
