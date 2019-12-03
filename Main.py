@@ -150,6 +150,8 @@ def main() -> None:
     all_done = False
     vert_count = 0
     generated = False
+    unselected_vertices = vertices
+    selected_vertices = []
     while running:
         screen.fill(bg_color)
         screen.blit(image, (0, 0))
@@ -222,54 +224,83 @@ def main() -> None:
         for b in buttons:
             b.draw(screen)
 
+
         for v in vertices:
             v.draw(screen)
 
+
+         #print(len(unselected_vertices))
+
         if city_selected:
-            while vert_count < 10:
-                for v in vertices:
+            while (len(unselected_vertices) >0):
+                connected_edges.clear()
+                for v in unselected_vertices:
                     if v.id == the_city_selected:
                         vert = v
+                        selected_vertices.append(vert)
+                        unselected_vertices.remove(vert)
+                        #print(len(unselected_vertices))
+                        #print(len(selected_vertices))
+
                 for e in edges:
-                    if disease_selected == "Cholera":
-                        if e.type == "water":
-                            if e.first[0] == vert.pos or e.second[0] == vert.pos:
-                                if not connected_edges.__contains__(e) and not e.selected:
-                                    connected_edges.append(e)
-                    elif disease_selected == "Flu":
-                        if e.type == "air":
-                            if e.first[0] == vert.pos or e.second[0] == vert.pos:
-                                if not connected_edges.__contains__(e) and not e.selected:
-                                    connected_edges.append(e)
-                    elif disease_selected == "Plague":
-                        if e.type == "animals":
-                            if e.first[0] == vert.pos or e.second[0] == vert.pos:
-                                if not connected_edges.__contains__(e) and not e.selected:
-                                    connected_edges.append(e)
+                    for vert in selected_vertices:
+                        if disease_selected == "Cholera":
+                            if e.type == "water":
+                                if e.first[0] == vert.pos or e.second[0] == vert.pos:
+                                    if not connected_edges.__contains__(e) and not e.selected:
+                                        if(e.first[0] not in selected_vertices and e.second[0] not in selected_vertices):
+                                            connected_edges.append(e)
+
+                        elif disease_selected == "Flu":
+                            if e.type == "air":
+                                if e.first[0] == vert.pos or e.second[0] == vert.pos:
+                                    if not connected_edges.__contains__(e) and not e.selected:
+                                        if (e.first[0] not in selected_vertices and e.second[ 0] not in selected_vertices):
+                                            connected_edges.append(e)
+                        elif disease_selected == "Plague":
+                            if e.type == "animals":
+                                if e.first[0] == vert.pos or e.second[0] == vert.pos:
+                                    if not connected_edges.__contains__(e) and not e.selected:
+                                        if (e.first[0] not in selected_vertices and e.second[0] not in selected_vertices):
+                                            connected_edges.append(e)
+
                 for ce in connected_edges:
                     if ce.weight < lowest and not ce.selected:
                         lowest = ce.weight
+                        #print(len(selected_vertices))
                 for ce in connected_edges:
                     if ce.weight == lowest:
+                        #print(lowest)
                         ce.draw(screen, [255, 0, 255])
                         ce.selected = True
-                        if ce.first[0] == vert.pos:
-                            temp = ce.second[0]
-                            for v in vertices:
-                                if v.pos == temp:
-                                    the_city_selected = v.id
-                                    v.change_color([255, 0, 255])
-                        elif ce.second[0] == vert.pos:
-                            temp = ce.first[0]
-                            for v in vertices:
-                                if v.pos == temp:
-                                    the_city_selected = v.id
-                                    v.change_color([255, 0, 255])
-                for v in vertices:
-                    if v.color == [255, 0, 255]:
-                        vert_count += 1
+
+                        for vs in selected_vertices:
+                            if ce.first[0]==vs.pos:
+                                #print(ce.first[0])
+                                temp = ce.second[0]
+                                for v in unselected_vertices:
+                                    if v.pos == temp:
+                                        the_city_selected = v.id
+                                        for ve in vertices:
+                                            if ve.id==v.id:
+                                                ve.change_color([255, 0, 255])
+
+                                        v.change_color([255, 0, 255])
+                            elif ce.second[0]==vs.pos:
+                                temp = ce.first[0]
+                                for v in unselected_vertices:
+                                    if v.pos == temp:
+                                        the_city_selected = v.id
+                                        for ve in vertices:
+                                            if ve.id == v.id:
+                                                ve.change_color([255, 0, 255])
+
+
                 lowest = 21
-                print(vert_count)
+                print(len(unselected_vertices))
+                #print(len(selected_vertices))
+                #print(vert_count)
+
 
         pygame.display.flip()
         # Event Loop
