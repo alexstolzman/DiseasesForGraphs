@@ -74,15 +74,6 @@ def generateEdges(cities, edges,type):
             edge = random.randint(0, len(cityEdges) - 1)
             cityEdges[edge].type = type
 
-def formsCycle(vertices, edges):
-   visited=[]
-
-
-
-
-
-
-   return False
 
 
 def main() -> None:
@@ -138,10 +129,6 @@ def main() -> None:
     ]
 
     edges = []
-    # edges.generate_edges(screen, cities)
-
-    # Generates edges
-    # edges={}
 
     for node in cities:
         for neighbor in cities[node]:
